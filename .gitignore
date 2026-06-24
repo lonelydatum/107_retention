@@ -1,0 +1,23 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build output
+dist/
+docs/zip/
+
+# OS
+.DS_Store
+
+# Env
+.env
+.env.local
+
+# Editor
+.vscode/
+.idea/
+
+# Temp
+*.tmp
+*.swp
