@@ -1,0 +1,136 @@
+:root {
+  --bg: #fff;
+  --text: #111;
+  --muted: #777;
+  --line: #eee;
+  --active: #111;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+a {
+  color: #aaa;
+}
+a:hover {
+  color: #666;
+}
+.app {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: 100vh;
+}
+.sidebar {
+  border-right: 1px solid var(--line);
+  padding: 24px 18px;
+}
+.title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0 0 20px;
+}
+.section {
+  margin: 18px 0;
+}
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.section-head h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+.toggle {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.sizes {
+  margin: 10px 0 0 0;
+  padding-left: 0;
+  list-style: none;
+  display: none;
+}
+.section.open .sizes {
+  display: block;
+}
+.size-item {
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #444;
+}
+.size-item:hover {
+  background: #f6f6f6;
+}
+.size-item.active {
+  background: #f0f0f0;
+  color: var(--active);
+  font-weight: 700;
+}
+.preview {
+  padding: 24px;
+  overflow: auto;
+}
+.preview-inner {
+  display: inline-block;
+}
+.frame-wrap {
+  background: #fff;
+  display: inline-block;
+}
+iframe {
+  display: block;
+  border: 0;
+}
+.below {
+  margin-top: 10px;
+  font-size: 16px;
+}
+.meta {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.meta b {
+  color: var(--text);
+}
+.note {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.size-item.disabled {
+  color: #bbb;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.size-item.disabled:hover {
+  background: transparent;
+}
+
+.btn-shot {
+  display: block;
+  margin-bottom: 20px;
+}

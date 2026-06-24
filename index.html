@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banner Preview</title>
+
+    <link rel="stylesheet" href="./preview_app/style.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      const SS = { type: "SS", title: "160x600" };
+      const BB = { type: "BB", title: "300x250" };
+      const DBB = { type: "DBB", title: "300x600" };
+      const M320 = { type: { w: 320, h: 50 }, title: "320x50" };
+      const LB = { type: "LB", title: "728x90" };
+      const M970x70 = { type: { w: 970, h: 70 }, title: "970x70" };
+      const M970x250 = { type: { w: 970, h: 250 }, title: "970x250" };
+      const M1000x700 = { type: { w: 1000, h: 700 }, title: "1000x700" };
+
+      var data = {
+        title: "You Play You",
+        banners: [
+          {
+            title: "Proline Player Props",
+            list: [
+              { ...SS, path: "prolinePlayerProps_160x600" },
+              { ...BB, path: "prolinePlayerProps_300x250" },
+              { ...DBB, path: "prolinePlayerProps_300x600" },
+              { ...M320, path: "prolinePlayerProps_320x50" },
+              { ...LB, path: "prolinePlayerProps_728x90" },
+              { ...M970x250, path: "prolinePlayerProps_970x250" },
+            ],
+          },
+          {
+            title: "Proline Parlay",
+            list: [
+              { ...SS, path: "prolineParlay_160x600" },
+              { ...BB, path: "prolineParlay_300x250" },
+              { ...DBB, path: "prolineParlay_300x600" },
+              { ...M320, path: "prolineParlay_320x50" },
+              { ...LB, path: "prolineParlay_728x90" },
+              { ...M970x250, path: "prolineParlay_970x250" },
+            ],
+          },
+          {
+            title: "Proline+ Player Props",
+            list: [
+              { ...SS, path: "plusPlayerProps_160x600" },
+              { ...BB, path: "plusPlayerProps_300x250" },
+              { ...DBB, path: "plusPlayerProps_300x600" },
+              { ...M320, path: "plusPlayerProps_320x50" },
+              { ...LB, path: "plusPlayerProps_728x90" },
+              { ...M970x250, path: "plusPlayerProps_970x250" },
+            ],
+          },
+          {
+            title: "Proline+ Parlay",
+            list: [
+              { ...SS, path: "plusParlay_160x600" },
+              { ...BB, path: "plusParlay_300x250" },
+              { ...DBB, path: "plusParlay_300x600" },
+              { ...M320, path: "plusParlay_320x50" },
+              { ...LB, path: "plusParlay_728x90" },
+              { ...M970x250, path: "plusParlay_970x250" },
+            ],
+          },
+        ],
+      };
+    </script>
+    <!-- Modern browsers -->
+    <script type="module" src="./preview_app/app.js"></script>
+  </body>
+</html>
