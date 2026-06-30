@@ -201,6 +201,113 @@ async function rasterizeSVGImages(doc, win) {
   );
 }
 
+function parseTranslateScale(transform) {
+  if (!transform || transform === "none") return { x: 0, y: 0, scaleX: 1, scaleY: 1 };
+
+  const matrix = transform.match(/^matrix\(([^)]+)\)$/);
+  if (matrix) {
+    const parts = matrix[1].split(",").map((n) => Number.parseFloat(n.trim()));
+    return {
+      x: parts[4] || 0,
+      y: parts[5] || 0,
+      scaleX: parts[0] || 1,
+      scaleY: parts[3] || 1,
+    };
+  }
+
+  const translate = transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+  const scale = transform.match(/scale\(([-\d.]+)(?:,\s*([-\d.]+))?\)/);
+
+  return {
+    x: translate ? Number.parseFloat(translate[1]) : 0,
+    y: translate ? Number.parseFloat(translate[2]) : 0,
+    scaleX: scale ? Number.parseFloat(scale[1]) : 1,
+    scaleY: scale ? Number.parseFloat(scale[2] || scale[1]) : 1,
+  };
+}
+
+async function rasterizeYpyGroups(doc, win) {
+  const groups = Array.from(doc.querySelectorAll(".ypy-all"));
+  if (!groups.length) return;
+
+  const dpr = Math.max(1, win.devicePixelRatio || 1);
+
+  await Promise.all(
+    groups.map(async (group) => {
+      const slots = Array.from(group.querySelectorAll(".ypy_all"));
+      if (!slots.length) return;
+
+      const slotRects = slots.map((slot) => slot.getBoundingClientRect()).filter((rect) => rect.width > 1 && rect.height > 1);
+      if (!slotRects.length) return;
+
+      const bounds = {
+        left: Math.min(...slotRects.map((rect) => rect.left)),
+        top: Math.min(...slotRects.map((rect) => rect.top)),
+        right: Math.max(...slotRects.map((rect) => rect.right)),
+        bottom: Math.max(...slotRects.map((rect) => rect.bottom)),
+      };
+      const rect = {
+        left: bounds.left,
+        top: bounds.top,
+        width: bounds.right - bounds.left,
+        height: bounds.bottom - bounds.top,
+      };
+      if (rect.width <= 1 || rect.height <= 1) return;
+
+      const canvas = doc.createElement("canvas");
+      canvas.width = Math.ceil(rect.width * dpr);
+      canvas.height = Math.ceil(rect.height * dpr);
+
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+
+      for (const slot of slots) {
+        const img = slot.querySelector("img");
+        if (!img || !img.complete || !img.naturalWidth) continue;
+
+        const slotRect = slot.getBoundingClientRect();
+        const imgTransform = parseTranslateScale(win.getComputedStyle(img).transform);
+        const slotTransform = parseTranslateScale(win.getComputedStyle(slot).transform);
+
+        const dx = slotRect.left - rect.left + imgTransform.x * slotTransform.scaleX;
+        const dy = slotRect.top - rect.top + imgTransform.y * slotTransform.scaleY;
+        const dw = img.naturalWidth * imgTransform.scaleX * slotTransform.scaleX;
+        const dh = img.naturalHeight * imgTransform.scaleY * slotTransform.scaleY;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(slotRect.left - rect.left, slotRect.top - rect.top, slotRect.width, slotRect.height);
+        ctx.clip();
+        ctx.drawImage(img, dx, dy, dw, dh);
+        ctx.restore();
+      }
+
+      const replacement = doc.createElement("img");
+      replacement.src = canvas.toDataURL("image/png");
+
+      const cs = win.getComputedStyle(group);
+      const bannerRect = (doc.querySelector("#banner") || group.parentElement).getBoundingClientRect();
+      Object.assign(replacement.style, {
+        position: "absolute",
+        left: `${rect.left - bannerRect.left}px`,
+        top: `${rect.top - bannerRect.top}px`,
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
+        transform: "none",
+        transformOrigin: cs.transformOrigin,
+        display: cs.display,
+        zIndex: cs.zIndex,
+        pointerEvents: "none",
+      });
+
+      group.replaceWith(replacement);
+    }),
+  );
+}
+
 export function makeScreenshotHandler({ iframe, getSelection }) {
   return async function () {
     const sel = getSelection();
@@ -228,6 +335,7 @@ export function makeScreenshotHandler({ iframe, getSelection }) {
       await new Promise((r) => win.requestAnimationFrame(r));
       await inlineSvgToPng(doc, win);
       await rasterizeSVGImages(doc);
+      await rasterizeYpyGroups(doc, win);
 
       const canvas = await win.html2canvas(target, {
         backgroundColor: "#00c853",
