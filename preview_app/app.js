@@ -1,6 +1,6 @@
 // import { data } from "./data.js";
 import { sizeFromType, clampIndex, parseHash, setHash, bannerSrc, zipSrc } from "./utils.js";
-import { makeScreenshotHandler } from "./screenshot.js?v=20260630-ypy-shot3";
+import { makeScreenshotHandler } from "./screenshot.js?v=20260630-shot150-q2";
 
 // (function normalizeUrl() {
 //   const clean = window.location.origin + window.location.pathname;

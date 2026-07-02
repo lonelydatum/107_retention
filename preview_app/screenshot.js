@@ -1,9 +1,11 @@
 import { downloadBlob, safeFilename, sizeFromType } from "./utils.js";
 
-function downscaleCanvasHalf(srcCanvas) {
+function resizeCanvas(srcCanvas, width, height) {
+  if (srcCanvas.width === width && srcCanvas.height === height) return srcCanvas;
+
   const out = document.createElement("canvas");
-  out.width = Math.max(1, Math.round(srcCanvas.width / 2));
-  out.height = Math.max(1, Math.round(srcCanvas.height / 2));
+  out.width = Math.max(1, Math.round(width));
+  out.height = Math.max(1, Math.round(height));
 
   const ctx = out.getContext("2d");
   ctx.imageSmoothingEnabled = true;
@@ -31,11 +33,11 @@ async function exportJpegUnderLimit(canvas, maxKB = 50) {
   const maxBytes = maxKB * 1024;
   const toBlobQ = (q) => new Promise((r) => canvas.toBlob(r, "image/jpeg", q));
 
-  let blob = await toBlobQ(0.95);
+  let blob = await toBlobQ(1);
   if (blob && blob.size <= maxBytes) return blob;
 
-  let lo = 0.35;
-  let hi = 0.95;
+  let lo = 0.65;
+  let hi = 1;
   let best = null;
 
   for (let i = 0; i < 8; i++) {
@@ -346,13 +348,11 @@ export function makeScreenshotHandler({ iframe, getSelection }) {
         },
       });
 
-      // ✅ reduce back to half before encoding
-      const halfCanvas = downscaleCanvasHalf(canvas);
-
-      const blob = await exportJpegUnderLimit(halfCanvas, 48);
+      const { w, h } = sizeFromType(item.type);
+      const outputCanvas = resizeCanvas(canvas, w, h);
+      const blob = await exportJpegUnderLimit(outputCanvas, 150);
       if (!blob) throw new Error("encode failed");
 
-      const { w, h } = sizeFromType(item.type);
       const name = safeFilename(item.path || group.title || "banner");
       const filename = `${name}.jpg`;
 
